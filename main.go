@@ -1,3 +1,4 @@
+// package main todo
 package main
 
 import (
@@ -32,7 +33,7 @@ func main() {
 	if err != nil {
 		logger.Panic(err)
 	}
-
+	//nolint:errcheck
 	defer robot.Close(context.Background())
 	logger.Info("Resources:")
 	logger.Info(robot.ResourceNames())
