@@ -6,9 +6,10 @@ import (
 
 	"github.com/edaniels/golog"
 	"github.com/joho/godotenv"
+	"go.viam.com/utils/rpc"
+
 	"go.viam.com/rdk/robot/client"
 	"go.viam.com/rdk/utils"
-	"go.viam.com/utils/rpc"
 )
 
 func main() {
@@ -16,7 +17,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		logger.Fatal(err)
+		logger.Panic(err)
 	}
 
 	robot, err := client.New(
@@ -29,7 +30,7 @@ func main() {
 		})),
 	)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Panic(err)
 	}
 
 	defer robot.Close(context.Background())

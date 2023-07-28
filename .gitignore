@@ -1,2 +1,4 @@
 main
 .env
+bin/
+coverage.txt
