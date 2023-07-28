@@ -1,4 +1,4 @@
-// package main todo
+// Package main starts the airbot.
 package main
 
 import (
@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/edaniels/golog"
+	"github.com/ethanlook/airbot"
+	"github.com/ethanlook/airbot/waypoint"
 	"github.com/joho/godotenv"
 	"go.viam.com/utils/rpc"
 
@@ -15,6 +17,7 @@ import (
 
 func main() {
 	logger := golog.NewDevelopmentLogger("client")
+	ctx := context.Background()
 
 	err := godotenv.Load()
 	if err != nil {
@@ -34,7 +37,8 @@ func main() {
 		logger.Panic(err)
 	}
 	//nolint:errcheck
-	defer robot.Close(context.Background())
-	logger.Info("Resources:")
-	logger.Info(robot.ResourceNames())
+	defer robot.Close(ctx)
+
+	a := airbot.NewAirBot(logger, robot, []*waypoint.Waypoint{})
+	a.Start()
 }
