@@ -1,4 +1,3 @@
-// package waypoint todo
 package waypoint
 
 import (
