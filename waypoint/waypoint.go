@@ -1,23 +1,27 @@
-// package waypoint todo
+// Package waypoint todo
 package waypoint
 
 import (
-	"github.com/gocarina/gocsv"
 	"os"
+
+	"github.com/gocarina/gocsv"
 )
 
+// Waypoint represents a point on a slam map we will navigate to.
 type Waypoint struct {
 	X float64 `csv:"x"`
 	Y float64 `csv:"y"`
 	Z float32 `csv:"z"`
 }
 
+// ReadWaypointsFromFile reads a csv and turns it into a list of points.
 func ReadWaypointsFromFile(path string) ([]*Waypoint, error) {
+	//nolint:gosec
 	waypointFile, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	//nolint:errcheck
+	//nolint:errcheck,gosec
 	defer waypointFile.Close()
 	waypoints := []*Waypoint{}
 
