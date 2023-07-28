@@ -33,7 +33,11 @@ test:
 
 .PHONY: build
 build: 
-	mkdir -p bin && go build $(GO_BUILD_LDFLAGS) -o bin/module ./main.go
+	mkdir -p bin && go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./main.go
+
+.PHONY: run
+run:
+	go run $(GO_BUILD_LDFLAGS) ./main.go
 
 .PHONY: buildstatic
 buildstatic: 
