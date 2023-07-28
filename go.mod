@@ -9,6 +9,7 @@ require (
 	github.com/edaniels/golinters v0.0.5-0.20220906153528-641155550742
 	github.com/edaniels/golog v0.0.0-20230215213219-28954395e8d0
 	github.com/fullstorydev/grpcurl v1.8.6
+	github.com/gocarina/gocsv v0.0.0-20230616125104-99d496ca653d
 	github.com/golangci/golangci-lint v1.51.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
 	github.com/joho/godotenv v1.5.1
