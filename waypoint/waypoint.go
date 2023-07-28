@@ -1,4 +1,4 @@
-// Package waypoint todo
+// Package waypoint contains code for represting waypoints
 package waypoint
 
 import (
