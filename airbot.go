@@ -26,7 +26,10 @@ func NewAirBot(logger golog.Logger, robotClient *client.RobotClient, waypoints [
 
 // Start starts the main navigation loop and data collection.
 func (a *AirBot) Start() {
+	// motion.FromRobot()
+	// slam, err := slam.FromRobot(a.robotClient, "slam-service")
 	for _, w := range a.waypoints {
-		a.logger.Infof("Waypoint: %v", w)
+		a.logger.Infof("Navigating to waypoint: %v", w)
+		// slam.
 	}
 }

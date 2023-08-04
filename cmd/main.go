@@ -1,8 +1,10 @@
-// Package main starts the airbot.
+// Package main starts the airbot
 package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"os"
 
 	"github.com/edaniels/golog"
@@ -15,11 +17,20 @@ import (
 	"go.viam.com/rdk/utils"
 )
 
+var (
+	routeName = flag.String("route", "w1", "Route to follow")
+)
+
 func main() {
 	logger := golog.NewDevelopmentLogger("client")
 	ctx := context.Background()
 
 	err := godotenv.Load()
+	if err != nil {
+		logger.Panic(err)
+	}
+
+	waypoints, err := waypoint.ReadWaypointsFromFile(fmt.Sprintf("routes/%v-route.csv", *routeName))
 	if err != nil {
 		logger.Panic(err)
 	}
@@ -39,6 +50,6 @@ func main() {
 	//nolint:errcheck
 	defer robot.Close(ctx)
 
-	a := airbot.NewAirBot(logger, robot, []*waypoint.Waypoint{})
+	a := airbot.NewAirBot(logger, robot, waypoints)
 	a.Start()
 }
