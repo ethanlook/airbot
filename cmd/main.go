@@ -1,4 +1,4 @@
-// Package main starts the airbot
+// Package main starts the airbot.
 package main
 
 import (
@@ -23,6 +23,7 @@ var (
 
 func main() {
 	logger := golog.NewDevelopmentLogger("client")
+	ctx := context.Background()
 	ctx := context.Background()
 
 	err := godotenv.Load()
