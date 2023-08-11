@@ -11,7 +11,7 @@ import (
 type Waypoint struct {
 	X float64 `csv:"x"`
 	Y float64 `csv:"y"`
-	Z float32 `csv:"z"`
+	Z float64 `csv:"z"`
 }
 
 // ReadWaypointsFromFile reads a csv and turns it into a list of points.
