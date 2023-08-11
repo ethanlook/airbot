@@ -7,11 +7,11 @@ import (
 	"math"
 
 	"github.com/edaniels/golog"
+	"github.com/ethanlook/airbot/move"
 	"github.com/ethanlook/airbot/waypoint"
 	"github.com/pkg/errors"
 
 	"go.viam.com/rdk/components/base"
-	"go.viam.com/rdk/components/motor"
 	"go.viam.com/rdk/robot/client"
 	"go.viam.com/rdk/services/slam"
 )
@@ -34,15 +34,17 @@ func NewAirBot(logger golog.Logger, robotClient *client.RobotClient, waypoints [
 
 // Start starts the main navigation loop and data collection.
 func (a *AirBot) Start() {
-	// motion.FromRobot()
-	// slam, err := slam.FromRobot(a.robotClient, "slam-service")
-	//ctx := context.Background()
+	moveManager, err := move.NewMoveManager(a.robotClient, a.logger)
+	if err != nil {
+		a.logger.Errorw("error creating move manager", "err", err)
+		return
+	}
 	for _, w := range a.waypoints {
-		a.logger.Infof("Navigating to waypoint: %v", w)
-
-	//	err := a.tryMoveToWaypoint(ctx, *w, 0.5, 2)
-		//fmt.Println(err)
-		// slam.
+		a.logger.Infof("Navigating to waypoint: %w", w)
+		err := moveManager.MoveOnMap(w)
+		if err != nil {
+			a.logger.Errorw("error moving on map", err)
+		}
 	}
 }
 

@@ -10,6 +10,7 @@ require (
 	github.com/edaniels/golog v0.0.0-20230215213219-28954395e8d0
 	github.com/fullstorydev/grpcurl v1.8.6
 	github.com/gocarina/gocsv v0.0.0-20230616125104-99d496ca653d
+	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551
 	github.com/golangci/golangci-lint v1.51.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
 	github.com/joho/godotenv v1.5.1
@@ -110,7 +111,6 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

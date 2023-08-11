@@ -3,6 +3,23 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import { getPosition } from './slam';
 import { rcLogConditionally } from '@/lib/log';
 
+export const getPosition = async (robotClient: Client, name: string) => {
+    const request = new slamApi.GetPositionRequest();
+    request.setName(name);
+  
+    const response = await new Promise<slamApi.GetPositionResponse | null>((resolve, reject) => {
+      robotClient.slamService.getPosition(request, (error, res) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  
+    return response?.getPose();
+  };
+
 export const moveOnMap = async (robotClient: Client, name: string, componentName: string, x: number, y: number) => {
   const request = new motionApi.MoveOnMapRequest();
 
