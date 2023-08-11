@@ -13,6 +13,7 @@ require (
 	github.com/golangci/golangci-lint v1.51.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
 	github.com/joho/godotenv v1.5.1
+	github.com/pkg/errors v0.9.1
 	github.com/rhysd/actionlint v1.6.24
 	go.viam.com/api v0.1.159
 	go.viam.com/rdk v0.6.0
@@ -216,7 +217,6 @@ require (
 	github.com/pion/turn/v2 v2.1.2 // indirect
 	github.com/pion/webrtc/v3 v3.2.11 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/profile v1.6.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/polyfloyd/go-errorlint v1.1.0 // indirect

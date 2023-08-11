@@ -4,7 +4,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 
 	"github.com/edaniels/golog"
@@ -30,7 +29,7 @@ func main() {
 		logger.Panic(err)
 	}
 
-	waypoints, err := waypoint.ReadWaypointsFromFile(fmt.Sprintf("routes/%v-route.csv", *routeName))
+	waypoints, err := waypoint.ReadWaypointsFromFile("routes/outside-w1-square.csv")
 	if err != nil {
 		logger.Panic(err)
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	"go.viam.com/rdk/components/base"
+	"go.viam.com/rdk/components/motor"
 	"go.viam.com/rdk/robot/client"
 	"go.viam.com/rdk/services/slam"
 )
@@ -35,17 +36,14 @@ func NewAirBot(logger golog.Logger, robotClient *client.RobotClient, waypoints [
 func (a *AirBot) Start() {
 	// motion.FromRobot()
 	// slam, err := slam.FromRobot(a.robotClient, "slam-service")
-	ctx := context.Background()
+	//ctx := context.Background()
 	for _, w := range a.waypoints {
 		a.logger.Infof("Navigating to waypoint: %v", w)
+
+	//	err := a.tryMoveToWaypoint(ctx, *w, 0.5, 2)
+		//fmt.Println(err)
 		// slam.
 	}
-	a.GetPos(ctx)
-	err := a.tryMoveToWaypoint(ctx, waypoint.Waypoint{
-		X: 0.26,
-		Y: 3.25,
-	}, 0.1, 1)
-	fmt.Println(err)
 }
 
 func (a *AirBot) GetPos(ctx context.Context) (*waypoint.Waypoint, float64, error) {
@@ -80,6 +78,7 @@ func (a *AirBot) distAndAngleTo(ctx context.Context, desiredPos waypoint.Waypoin
 
 func (a *AirBot) tryMoveToWaypoint(ctx context.Context, desiredPos waypoint.Waypoint, tol float64, numTries int) error {
 	n := 0
+
 	base, err := base.FromRobot(a.robotClient, "viam_base")
 	if err != nil {
 		return err
@@ -91,14 +90,17 @@ func (a *AirBot) tryMoveToWaypoint(ctx context.Context, desiredPos waypoint.Wayp
 	}
 	for dist >= tol && n < numTries {
 		n += 1
+		fmt.Println(n)
+		fmt.Println(dist)
+		fmt.Println(detaTheta)
 
 		fmt.Printf("starting spin %v degrees\n", int(detaTheta*57.29))
-		err = base.Spin(ctx, detaTheta*57.29, 100, map[string]interface{}{})
+		err = base.Spin(ctx, -1*detaTheta*57.29, 20, map[string]interface{}{})
 		if err != nil {
 			return err
 		}
 		fmt.Printf(" starting move %v\n", dist)
-		err = base.MoveStraight(ctx, int(math.Floor(dist*1000)), 1000.0, map[string]interface{}{})
+		err = base.MoveStraight(ctx, int(math.Floor(dist*1000)/2), 100.0, map[string]interface{}{})
 		if err != nil {
 			return err
 		}
