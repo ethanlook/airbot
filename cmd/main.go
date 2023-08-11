@@ -24,7 +24,6 @@ var (
 func main() {
 	logger := golog.NewDevelopmentLogger("client")
 	ctx := context.Background()
-	ctx := context.Background()
 
 	err := godotenv.Load()
 	if err != nil {
