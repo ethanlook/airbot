@@ -15,8 +15,6 @@ import (
 	"go.viam.com/rdk/utils"
 )
 
-// var routeName = flag.String("route", "w1", "Route to follow")
-
 func main() {
 	logger := golog.NewDevelopmentLogger("client")
 	ctx := context.Background()

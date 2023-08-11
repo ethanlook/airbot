@@ -6,10 +6,11 @@ import (
 
 	"github.com/ethanlook/airbot/waypoint"
 	v1 "go.viam.com/api/app/datasync/v1"
-	"go.viam.com/rdk/resource"
-	"go.viam.com/rdk/services/datamanager/datacapture"
 	"go.viam.com/utils/protoutils"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"go.viam.com/rdk/resource"
+	"go.viam.com/rdk/services/datamanager/datacapture"
 )
 
 type PhotoReading struct {
@@ -34,15 +35,14 @@ type AirbotDataManager struct {
 
 func NewAirbotDataManager(targetDir string) (*AirbotDataManager, error) {
 	captureMetadata, err := datacapture.BuildCaptureMetadata(
-		resource.NewAPI("airbot", "data", "collection"), //config.Name.API,
-		"airbot",  //config.Name.ShortName(),
-		"collect", //config.Method,
-		nil,       //config.AdditionalParams,
-		nil,       //config.Tags,
+
+		"airbot",  // config.Name.ShortName(),
+		"collect", // config.Method,
+		nil,       // config.AdditionalParams,
+		nil,       // config.Tags,
 	)
 	if err != nil {
 		return nil, err
-
 	}
 	context, cancelFunc := context.WithCancel(context.Background())
 	return &AirbotDataManager{
@@ -51,11 +51,10 @@ func NewAirbotDataManager(targetDir string) (*AirbotDataManager, error) {
 
 		writer: datacapture.NewBuffer(targetDir, captureMetadata),
 	}, nil
-
 }
 
 // TODO
-// Add a lock / basic async otherwise this may hang
+// Add a lock / basic async otherwise this may hang.
 func (adm *AirbotDataManager) UploadReading(wp *WaypointReading) error {
 	proto, err := WaypointReadingToProto(wp)
 	if err != nil {
