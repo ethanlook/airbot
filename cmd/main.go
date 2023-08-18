@@ -3,8 +3,6 @@ package main
 
 import (
 	"context"
-	"flag"
-	"fmt"
 	"os"
 
 	"github.com/edaniels/golog"
@@ -17,13 +15,10 @@ import (
 	"go.viam.com/rdk/utils"
 )
 
-var (
-	routeName = flag.String("route", "w1", "Route to follow")
-)
+// var routeName = flag.String("route", "w1", "Route to follow")
 
 func main() {
 	logger := golog.NewDevelopmentLogger("client")
-	ctx := context.Background()
 	ctx := context.Background()
 
 	err := godotenv.Load()
@@ -31,11 +26,11 @@ func main() {
 		logger.Panic(err)
 	}
 
-	waypoints, err := waypoint.ReadWaypointsFromFile(fmt.Sprintf("routes/%v-route.csv", *routeName))
+	waypoints, err := waypoint.ReadWaypointsFromFile("./routes/w1-route.csv")
 	if err != nil {
 		logger.Panic(err)
 	}
-
+	logger.Infof("moving to waypoints: %v", waypoints)
 	robot, err := client.New(
 		context.Background(),
 		os.Getenv("ROBOT_LOCATION"),
@@ -50,7 +45,7 @@ func main() {
 	}
 	//nolint:errcheck
 	defer robot.Close(ctx)
-
+	logger.Info("successfully connected to the robot")
 	a := airbot.NewAirBot(logger, robot, waypoints)
 	a.Start()
 }
