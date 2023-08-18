@@ -60,7 +60,7 @@ func (mm *MoveManger) MoveOnMap(wp *waypoint.Waypoint) error {
 	pose := spatialmath.NewPose(wp.ConvertToR3Vector(), lastPose.Orientation())
 	motionConfig := make(map[string]interface{})
 	motionConfig["motion_profile"] = "position_only"
-	motionConfig["timeout"] = 5
+	motionConfig["timeout"] = 30
 
 	_, err = mm.ms.MoveOnMap(ctx, mm.base.Name(), pose, mm.slam.Name(), motionConfig)
 	if err != nil {
