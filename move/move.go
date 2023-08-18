@@ -1,3 +1,4 @@
+// Package move contains the code to make a robot move on a slam map
 package move
 
 import (
@@ -5,6 +6,7 @@ import (
 
 	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot/waypoint"
+
 	"go.viam.com/rdk/components/base"
 	"go.viam.com/rdk/robot/client"
 	"go.viam.com/rdk/services/motion"
@@ -12,11 +14,13 @@ import (
 	"go.viam.com/rdk/spatialmath"
 )
 
+// Move defines the interface to Move.
 type Move interface {
 	MoveOnMap(wp *waypoint.Waypoint) error
 }
 
-type MoveManger struct {
+// Manager holds all necessary info to move.
+type Manager struct {
 	// robot client
 	rc *client.RobotClient
 	// motion service
@@ -28,6 +32,7 @@ type MoveManger struct {
 	logger golog.Logger
 }
 
+// NewMoveManager creates a MoveManager.
 func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move, error) {
 	ms, err := motion.FromRobot(robotClient, "builtin")
 	if err != nil {
@@ -42,10 +47,11 @@ func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move,
 		return nil, err
 	}
 
-	return &MoveManger{rc: robotClient, ms: ms, slam: slam, base: base, logger: logger}, nil
+	return &Manager{rc: robotClient, ms: ms, slam: slam, base: base, logger: logger}, nil
 }
 
-func (mm *MoveManger) MoveOnMap(wp *waypoint.Waypoint) error {
+// MoveOnMap moves the rover to a waypoint on the slam map.
+func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

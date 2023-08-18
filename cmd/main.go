@@ -3,7 +3,7 @@ package main
 
 import (
 	"context"
-	"flag"
+	"os"
 
 	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot"
@@ -15,9 +15,7 @@ import (
 	"go.viam.com/rdk/utils"
 )
 
-var (
-	routeName = flag.String("route", "w1", "Route to follow")
-)
+// var routeName = flag.String("route", "w1", "Route to follow")
 
 func main() {
 	logger := golog.NewDevelopmentLogger("client")
@@ -35,11 +33,11 @@ func main() {
 	logger.Infof("moving to waypoints: %v", waypoints)
 	robot, err := client.New(
 		context.Background(),
-		"airbot-agilex-main.74fk6cl2ql.viam.cloud",
+		os.Getenv("ROBOT_LOCATION"),
 		logger,
 		client.WithDialOptions(rpc.WithCredentials(rpc.Credentials{
 			Type:    utils.CredentialsTypeRobotLocationSecret,
-			Payload: "2z1nmyra7oi6iyl5ovfoz1762uhi2m0u5gnrlm7bqdzwgq01",
+			Payload: os.Getenv("ROBOT_SECRET"),
 		})),
 	)
 	if err != nil {
@@ -47,7 +45,7 @@ func main() {
 	}
 	//nolint:errcheck
 	defer robot.Close(ctx)
-	logger.Infof("successfully connected to the robot")
+	logger.Info("successfully connected to the robot")
 	a := airbot.NewAirBot(logger, robot, waypoints)
 	a.Start()
 }

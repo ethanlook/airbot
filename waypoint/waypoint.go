@@ -15,6 +15,7 @@ type Waypoint struct {
 	Z float64 `csv:"z"`
 }
 
+// ConvertToR3Vector converts a waypoint to a vector.
 func (wp *Waypoint) ConvertToR3Vector() r3.Vector {
 	// coordinates from web ui are in m, MoveOnMap() uses mm so need to convert
 	return r3.Vector{
