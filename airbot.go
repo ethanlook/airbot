@@ -3,6 +3,7 @@ package airbot
 
 import (
 	"github.com/edaniels/golog"
+	imagedetector "github.com/ethanlook/airbot/image_detector"
 	"github.com/ethanlook/airbot/move"
 	"github.com/ethanlook/airbot/waypoint"
 
@@ -32,6 +33,12 @@ func (a *AirBot) Start() {
 		a.logger.Errorw("error creating move manager", "err", err)
 		return
 	}
+	detector, err := imagedetector.NewDetector(a.robotClient, "top-cam", "coffee-mug-detector", a.logger)
+	if err != nil {
+		a.logger.Errorw("error creating detector", "err", err)
+		return
+	}
+
 	for _, w := range a.waypoints {
 		a.logger.Infof("Starting navigation to waypoint: %w", w)
 		err := moveManager.MoveOnMap(w)
@@ -40,7 +47,14 @@ func (a *AirBot) Start() {
 			a.logger.Errorw("exiting the program")
 			return
 		}
+
+		detections, err := detector.GetDetectionsFromCamera()
+		if err != nil {
+			continue
+		}
+
 		a.logger.Infof("Successfully made it to waypoint: %w", w)
+		a.logger.Infof("I have found %d mugs at waypoint %v", detector.HowManyMugs(detections))
 	}
 }
 
