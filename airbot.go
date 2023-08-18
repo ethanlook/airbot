@@ -43,7 +43,7 @@ func (a *AirBot) Start() {
 		a.logger.Infof("Starting navigation to waypoint: %w", w)
 		err := moveManager.MoveOnMap(w)
 		if err != nil {
-			a.logger.Errorw("error moving on map", err)
+			a.logger.Errorw("error moving on map", "err", err)
 			a.logger.Errorw("exiting the program")
 			return
 		}

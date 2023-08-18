@@ -33,11 +33,11 @@ func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move,
 	if err != nil {
 		return nil, err
 	}
-	slam, err := slam.FromRobot(robotClient, "slam-kitchen3")
+	slam, err := slam.FromRobot(robotClient, "run-slam")
 	if err != nil {
 		return nil, err
 	}
-	base, err := base.FromRobot(robotClient, "viam_base")
+	base, err := base.FromRobot(robotClient, "base1")
 	if err != nil {
 		return nil, err
 	}

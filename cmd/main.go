@@ -35,11 +35,11 @@ func main() {
 	logger.Infof("moving to waypoints: %v", waypoints)
 	robot, err := client.New(
 		context.Background(),
-		"airbot-main.74fk6cl2ql.viam.cloud",
+		"agilexlimo-main.m8n3hqcv6r.viam.cloud",
 		logger,
 		client.WithDialOptions(rpc.WithCredentials(rpc.Credentials{
 			Type:    utils.CredentialsTypeRobotLocationSecret,
-			Payload: "aatjlkxkblh9tl5gj1y9rsr9rsqs1cbfro7cwur9xkukphtt",
+			Payload: "k5sa7me1ppx0irjpayrm29pqwb79kf8zanoixr5f62v9ct7u",
 		})),
 	)
 	if err != nil {
