@@ -2,7 +2,6 @@ package move
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot/waypoint"
@@ -27,12 +26,10 @@ type MoveManger struct {
 	// allows us to cancel the request
 	base   base.Base
 	logger golog.Logger
-	cancel func()
 }
 
 func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move, error) {
 	ms, err := motion.FromRobot(robotClient, "builtin")
-	fmt.Print(robotClient.ResourceNames())
 	if err != nil {
 		return nil, err
 	}
@@ -52,14 +49,20 @@ func (mm *MoveManger) MoveOnMap(wp *waypoint.Waypoint) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// lastPose, err := mm.ms.GetPose(ctx, mm.base.Name(), "world")
+	// moveOnMap uses the last orientation to pass to the new pose
+	// so followed that implementation there
 
-	pose := spatialmath.NewPose(wp.ConvertToR3Vector(), spatialmath.NewOrientationVector())
+	lastPose, _, err := mm.slam.GetPosition(ctx)
+	if err != nil {
+		return err
+	}
+
+	pose := spatialmath.NewPose(wp.ConvertToR3Vector(), lastPose.Orientation())
 	motionConfig := make(map[string]interface{})
 	motionConfig["motion_profile"] = "position_only"
 	motionConfig["timeout"] = 5
 
-	_, err := mm.ms.MoveOnMap(ctx, mm.base.Name(), pose, mm.slam.Name(), motionConfig)
+	_, err = mm.ms.MoveOnMap(ctx, mm.base.Name(), pose, mm.slam.Name(), motionConfig)
 	if err != nil {
 		return err
 	}

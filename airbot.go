@@ -40,13 +40,18 @@ func (a *AirBot) Start() {
 		return
 	}
 	for _, w := range a.waypoints {
-		a.logger.Infof("Navigating to waypoint: %w", w)
+		a.logger.Infof("Starting navigation to waypoint: %w", w)
 		err := moveManager.MoveOnMap(w)
 		if err != nil {
 			a.logger.Errorw("error moving on map", err)
+			a.logger.Errorw("exiting the program")
+			return
 		}
+		a.logger.Infof("Successfully made it to waypoint: %w", w)
 	}
 }
+
+// FOR CUSTOM ALGO BELOW
 
 func (a *AirBot) GetPos(ctx context.Context) (*waypoint.Waypoint, float64, error) {
 	slam, err := slam.FromRobot(a.robotClient, "slam-service")
