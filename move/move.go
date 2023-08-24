@@ -16,7 +16,8 @@ import (
 
 // Move defines the interface to Move.
 type Move interface {
-	MoveOnMap(wp *waypoint.Waypoint) error
+	MoveOnMap(wp *waypoint.Waypoint, attempts int) error
+	Turn90() error
 }
 
 // Manager holds all necessary info to move.
@@ -42,7 +43,7 @@ func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move,
 	if err != nil {
 		return nil, err
 	}
-	base, err := base.FromRobot(robotClient, "base1")
+	base, err := base.FromRobot(robotClient, "viam_base")
 	if err != nil {
 		return nil, err
 	}
@@ -51,26 +52,40 @@ func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move,
 }
 
 // MoveOnMap moves the rover to a waypoint on the slam map.
-func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint) error {
+func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint, attempts int) error {
+	parentCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := 1; i <= attempts; i++ {
+		// moveOnMap uses the last orientation to pass to the new pose
+		// so followed that implementation there
+		ctx, _ := context.WithCancel(parentCtx)
+
+		lastPose, _, err := mm.slam.GetPosition(ctx)
+		if err != nil {
+			return err
+		}
+
+		pose := spatialmath.NewPose(wp.ConvertToR3Vector(), lastPose.Orientation())
+		motionConfig := make(map[string]interface{})
+		motionConfig["motion_profile"] = "position_only"
+		motionConfig["timeout"] = 30
+		_, err = mm.ms.MoveOnMap(ctx, mm.base.Name(), pose, mm.slam.Name(), motionConfig)
+		if err != nil && i == attempts {
+			mm.logger.Errorw("Errored on final attempt to navigate to waypoint", "err", err)
+			return err
+		} else if err == nil {
+			return nil
+		}
+		mm.logger.Errorw("Navigation attempt failed", "err", err)
+		mm.logger.Infof("Retry navigation to waypoint (#%d): %w", i, wp)
+	}
+	return nil
+}
+
+func (mm *Manager) Turn90() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// moveOnMap uses the last orientation to pass to the new pose
-	// so followed that implementation there
-
-	lastPose, _, err := mm.slam.GetPosition(ctx)
-	if err != nil {
-		return err
-	}
-
-	pose := spatialmath.NewPose(wp.ConvertToR3Vector(), lastPose.Orientation())
-	motionConfig := make(map[string]interface{})
-	motionConfig["motion_profile"] = "position_only"
-	motionConfig["timeout"] = 30
-
-	_, err = mm.ms.MoveOnMap(ctx, mm.base.Name(), pose, mm.slam.Name(), motionConfig)
-	if err != nil {
-		return err
-	}
-	return nil
+	return mm.base.Spin(ctx, 90, 45, map[string]interface{}{})
 }
