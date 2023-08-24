@@ -14,15 +14,22 @@ import (
 type AirBot struct {
 	logger      golog.Logger
 	robotClient *client.RobotClient
+	dataManager *AirbotDataManager
 	waypoints   []*waypoint.Waypoint
 }
 
 // NewAirBot creates a new AirBot.
-func NewAirBot(logger golog.Logger, robotClient *client.RobotClient, waypoints []*waypoint.Waypoint) *AirBot {
+func NewAirBot(
+	logger golog.Logger,
+	robotClient *client.RobotClient,
+	waypoints []*waypoint.Waypoint,
+	dataManager *AirbotDataManager,
+) *AirBot {
 	return &AirBot{
 		logger:      logger,
 		robotClient: robotClient,
 		waypoints:   waypoints,
+		dataManager: dataManager,
 	}
 }
 

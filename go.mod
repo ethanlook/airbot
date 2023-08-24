@@ -14,11 +14,13 @@ require (
 	github.com/golangci/golangci-lint v1.51.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
 	github.com/joho/godotenv v1.5.1
+	github.com/pkg/errors v0.9.1
 	github.com/rhysd/actionlint v1.6.24
-	go.viam.com/api v0.1.159
-	go.viam.com/rdk v0.6.0
+	go.uber.org/multierr v1.11.0
+	go.viam.com/api v0.1.181
+	go.viam.com/rdk v0.7.3
 	go.viam.com/test v1.1.1-0.20220913152726-5da9916c08a2
-	go.viam.com/utils v0.1.38
+	go.viam.com/utils v0.1.40
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.30.0
 	gotest.tools/gotestsum v1.10.0
@@ -224,7 +226,6 @@ require (
 	github.com/pion/turn/v2 v2.1.2 // indirect
 	github.com/pion/webrtc/v3 v3.2.11 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/profile v1.6.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/polyfloyd/go-errorlint v1.1.0 // indirect
@@ -294,9 +295,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/goleak v1.2.1 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	go.viam.com/api v0.1.159 // indirect
 	goji.io v2.0.2+incompatible // indirect
 	golang.org/x/crypto v0.10.0 // indirect
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29 // indirect
