@@ -1,25 +1,30 @@
+// Package imagedetector makes an image detector for getting detections from the camera stream
 package imagedetector
 
 import (
 	"context"
 
 	"github.com/edaniels/golog"
+
 	"go.viam.com/rdk/components/camera"
 	"go.viam.com/rdk/robot/client"
 	"go.viam.com/rdk/services/vision"
 )
 
+// NewDetector returns a new image detector.
 func NewDetector(robotClient *client.RobotClient, logger golog.Logger) error {
 	// Grab the camera from the robot
 	cameraName := "top-cam" // make sure to use the same component name that you have in your robot configuration
 	myCam, err := camera.FromRobot(robotClient, cameraName)
 	if err != nil {
-		logger.Fatalf("cannot get camera: %v", err)
+		logger.Errorw("cannot get camera: %v", "err", err)
+		return err
 	}
 
 	visService, err := vision.FromRobot(robotClient, "coffee-mug-vision-service")
 	if err != nil {
-		logger.Fatalf("Cannot get vision service: %v", err)
+		logger.Errorw("Cannot get vision service: %v", "err", err)
+		return err
 	}
 
 	// Get detections from the camera output

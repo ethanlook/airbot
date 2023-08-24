@@ -53,13 +53,14 @@ func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move,
 
 // MoveOnMap moves the rover to a waypoint on the slam map.
 func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint, attempts int) error {
-	parentCtx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	for i := 1; i <= attempts; i++ {
 		// moveOnMap uses the last orientation to pass to the new pose
 		// so followed that implementation there
-		ctx, _ := context.WithCancel(parentCtx)
+
+		// TODO(ethanlook): Child context?
 
 		lastPose, _, err := mm.slam.GetPosition(ctx)
 		if err != nil {
@@ -83,6 +84,7 @@ func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint, attempts int) error {
 	return nil
 }
 
+// Turn90 spins the base 90 degrees.
 func (mm *Manager) Turn90() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
