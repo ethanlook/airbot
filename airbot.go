@@ -3,7 +3,7 @@ package airbot
 
 import (
 	"github.com/edaniels/golog"
-	imagedetector "github.com/ethanlook/airbot/image_detector"
+	"github.com/ethanlook/airbot/imagedetector"
 	"github.com/ethanlook/airbot/move"
 	"github.com/ethanlook/airbot/waypoint"
 
@@ -39,95 +39,35 @@ func (a *AirBot) Start() {
 		return
 	}
 
-	for _, w := range a.waypoints {
-		a.logger.Infof("Starting navigation to waypoint: %w", w)
-		err := moveManager.MoveOnMap(w)
+	for i, w := range a.waypoints {
+		a.logger.Infof("Starting navigation to waypoint #%d: %w", i, w)
+		err := moveManager.MoveOnMap(w, 3)
 		if err != nil {
 			a.logger.Errorw("error moving on map", "err", err)
 			a.logger.Errorw("exiting the program")
 			return
 		}
 
-		detections, err := detector.GetDetectionsFromCamera()
-		if err != nil {
-			continue
+		a.logger.Infof("Successfully made it to waypoint: %w", w)
+
+		a.logger.Info("Starting coffee mug detection")
+
+		for j := 1; j <= 4; j++ {
+			a.logger.Infof("Turning 90 degrees #%d", j)
+			err = moveManager.Turn90()
+			if err != nil {
+				a.logger.Errorw("error turning 90 degrees", "err", err)
+			}
+
+			a.logger.Info("Doing image detection")
+			detections, err := detector.GetDetectionsFromCamera()
+			if err != nil {
+				continue
+			}
+
+			a.logger.Infof("Found %d mugs at waypoint #%d, turn #%d", detector.HowManyMugs(detections), i, j)
 		}
 
-		a.logger.Infof("Successfully made it to waypoint: %w", w)
-		a.logger.Infof("I have found %d mugs at waypoint %v", detector.HowManyMugs(detections))
+		a.logger.Info("Finished coffee mug detection")
 	}
 }
-
-// FOR CUSTOM ALGO BELOW
-
-// func (a *AirBot) GetPos(ctx context.Context) (*waypoint.Waypoint, float64, error) {
-// 	slam, err := slam.FromRobot(a.robotClient, "slam-service")
-// 	if err != nil {
-// 		return nil, 0.0, err
-// 	}
-// 	pos, _, err := slam.GetPosition(ctx)
-// 	fmt.Println(pos)
-// 	point := pos.Point()
-// 	fmt.Printf("pos: %v\n", pos.Point())
-// 	fmt.Printf("or: %v\n", pos.Orientation().AxisAngles().Theta)
-// 	return &waypoint.Waypoint{
-// 		X: point.X / 1000.0,
-// 		Y: point.Y / 1000.0,
-// 	}, pos.Orientation().AxisAngles().Theta, nil
-// }
-
-// func (a *AirBot) distAndAngleTo(ctx context.Context, desiredPos waypoint.Waypoint) (float64, float64, error) {
-// 	currentPos, theta, err := a.GetPos(ctx)
-// 	if err != nil {
-// 		return 0, 0, err
-// 	}
-// 	dx := desiredPos.X - currentPos.X
-// 	dy := desiredPos.Y - currentPos.Y
-// 	distSquared := dx*dx + dy*dy
-// 	desiredTheta := math.Atan2(dy, dx)
-// 	detaTheta := desiredTheta - theta
-// 	dist := math.Sqrt(distSquared)
-// 	return dist, detaTheta, nil
-// }
-
-// func (a *AirBot) tryMoveToWaypoint(ctx context.Context, desiredPos waypoint.Waypoint, tol float64, numTries int) error {
-// 	n := 0
-
-// 	base, err := base.FromRobot(a.robotClient, "viam_base")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	dist, detaTheta, err := a.distAndAngleTo(ctx, desiredPos)
-// 	if err != nil {
-// 		return err
-
-// 	}
-// 	for dist >= tol && n < numTries {
-// 		n += 1
-// 		fmt.Println(n)
-// 		fmt.Println(dist)
-// 		fmt.Println(detaTheta)
-
-// 		fmt.Printf("starting spin %v degrees\n", int(detaTheta*57.29))
-// 		err = base.Spin(ctx, -1*detaTheta*57.29, 20, map[string]interface{}{})
-// 		if err != nil {
-// 			return err
-// 		}
-// 		fmt.Printf(" starting move %v\n", dist)
-// 		err = base.MoveStraight(ctx, int(math.Floor(dist*1000)/2), 100.0, map[string]interface{}{})
-// 		if err != nil {
-// 			return err
-// 		}
-// 		dist, detaTheta, err = a.distAndAngleTo(ctx, desiredPos)
-// 		if err != nil {
-// 			return err
-
-// 		}
-// 	}
-// 	if dist <= tol {
-// 		return nil
-
-// 	}
-// 	return errors.New("failed to reach desired tol")
-
-// }
