@@ -1,67 +1,67 @@
-// Package imagedetector makes an image detector for getting detections from the camera stream
+// Package imagedetector holds information regarding the detector
 package imagedetector
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/edaniels/golog"
 
 	"go.viam.com/rdk/components/camera"
 	"go.viam.com/rdk/robot/client"
 	"go.viam.com/rdk/services/vision"
+	"go.viam.com/rdk/vision/objectdetection"
 )
 
-// NewDetector returns a new image detector.
-func NewDetector(robotClient *client.RobotClient, logger golog.Logger) error {
+// Detector stores information for the vision service detector.
+type Detector struct {
+	cam    camera.Camera
+	vs     vision.Service
+	logger golog.Logger
+}
+
+// GetDetectionsFromCamera gets detections from camera.
+func (detector *Detector) GetDetectionsFromCamera() ([]objectdetection.Detection, error) {
+	return detector.vs.DetectionsFromCamera(context.Background(), detector.cam.Name().Name, map[string]interface{}{})
+}
+
+// HowManyMugs determines how many mugs in the frame.
+func (detector *Detector) HowManyMugs(detections []objectdetection.Detection) int {
+	threshold := 0.7
+	count := 0
+
+	for _, detection := range detections {
+		label := detection.Label()
+		score := detection.Score()
+		if label == "coffee-mug" && score > threshold {
+			count++
+		}
+	}
+
+	return count
+}
+
+// NewDetector returns a new detector.
+func NewDetector(
+	robotClient *client.RobotClient,
+	cameraName string,
+	visionServiceName string,
+	logger golog.Logger,
+) (*Detector, error) {
 	// Grab the camera from the robot
-	cameraName := "top-cam" // make sure to use the same component name that you have in your robot configuration
 	myCam, err := camera.FromRobot(robotClient, cameraName)
 	if err != nil {
-		logger.Errorw("cannot get camera: %v", "err", err)
-		return err
+		return nil, fmt.Errorf("cannot get camera: %w", err)
 	}
 
-	visService, err := vision.FromRobot(robotClient, "coffee-mug-vision-service")
+	visService, err := vision.FromRobot(robotClient, visionServiceName)
 	if err != nil {
-		logger.Errorw("Cannot get vision service: %v", "err", err)
-		return err
+		return nil, fmt.Errorf("cannot get vision service: %w", err)
 	}
 
-	// Get detections from the camera output
-	detections, err := visService.DetectionsFromCamera(context.Background(), cameraName, map[string]interface{}{})
-	if err != nil {
-		logger.Errorw("Could not get detections", "err", err)
-		return err
-	}
-	if len(detections) > 0 {
-		logger.Info(detections[0])
-	}
-
-	// If you need to store the image, get the image first
-	// and then run detections on it. This process is slower:
-
-	// Get the stream from a camera
-	camStream, err := myCam.Stream(context.Background())
-	if err != nil {
-		logger.Errorw("Could not open camera stream", "err", err)
-		return err
-	}
-
-	// Get an image from the camera stream
-	img, release, err := camStream.Next(context.Background())
-	if err != nil {
-		logger.Errorw("Could not get an image from the camera stream", "err", err)
-		return err
-	}
-	defer release()
-
-	detectionsFromImage, err := visService.Detections(context.Background(), img, nil)
-	if err != nil {
-		logger.Errorw("Could not get detections", "err", err)
-		return err
-	}
-	for _, detection := range detectionsFromImage {
-		logger.Info(detection)
-	}
-	return nil
+	return &Detector{
+		cam:    myCam,
+		vs:     visService,
+		logger: logger,
+	}, nil
 }
