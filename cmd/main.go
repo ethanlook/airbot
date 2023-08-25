@@ -3,35 +3,54 @@ package main
 
 import (
 	"context"
+	"errors"
+	"flag"
+	"fmt"
+	"net"
 	"os"
 
 	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot"
-	"github.com/ethanlook/airbot/waypoint"
-	"github.com/joho/godotenv"
+	pb "github.com/ethanlook/airbot/proto/v1"
 	"go.viam.com/utils/rpc"
+	"google.golang.org/grpc"
 
 	"go.viam.com/rdk/robot/client"
 	"go.viam.com/rdk/utils"
 )
 
-// var routeName = flag.String("route", "w1", "Route to follow")
+var (
+	port         = flag.Int("port", 50051, "The server port")
+	errNoRequest = errors.New("missing request")
+)
+
+// server is used to implement airbot.AirbotServiceServer.
+type server struct {
+	pb.UnimplementedAirbotServiceServer
+
+	a      *airbot.AirBot
+	logger golog.Logger
+}
+
+// Start implements airbot.Start.
+func (s *server) Start(ctx context.Context, req *pb.StartRequest) (*pb.StartResponse, error) {
+	if req == nil {
+		return nil, errNoRequest
+	}
+	err := s.a.Start(req.GetRoute())
+	if err != nil {
+		s.logger.Errorf("Error running Start: %w", err)
+		return nil, fmt.Errorf("error running Start: %w", err)
+	}
+	return &pb.StartResponse{}, nil
+}
 
 func main() {
+	flag.Parse()
 	logger := golog.NewDevelopmentLogger("client")
 	ctx := context.Background()
 
-	err := godotenv.Load()
-	if err != nil {
-		logger.Panic(err)
-	}
-
-	waypoints, err := waypoint.ReadWaypointsFromFile("./routes/kitchen-route.csv")
-	if err != nil {
-		logger.Panic(err)
-	}
-	logger.Infof("moving to waypoints: %v", waypoints)
-	robot, err := client.New(
+	robotClient, err := client.New(
 		context.Background(),
 		os.Getenv("ROBOT_LOCATION"),
 		logger,
@@ -41,11 +60,25 @@ func main() {
 		})),
 	)
 	if err != nil {
-		logger.Panic(err)
+		logger.Fatalf("failed to rcreate robot client")
 	}
-	//nolint:errcheck
-	defer robot.Close(ctx)
+	defer func() {
+		err = robotClient.Close(ctx)
+	}()
 	logger.Info("successfully connected to the robot")
-	a := airbot.NewAirBot(logger, robot, waypoints)
-	a.Start()
+
+	a := airbot.NewAirBot(logger, robotClient)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	if err != nil {
+		logger.Fatalf("failed to listen: %v", err)
+	}
+
+	s := grpc.NewServer()
+	pb.RegisterAirbotServiceServer(s, &server{a: a})
+	logger.Infof("server listening at %v", lis.Addr())
+
+	if err := s.Serve(lis); err != nil {
+		logger.Fatalf("failed to serve: %v", err)
+	}
 }
