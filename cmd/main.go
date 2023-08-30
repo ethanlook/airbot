@@ -26,7 +26,7 @@ func main() {
 		logger.Panic(err)
 	}
 
-	waypoints, err := waypoint.ReadWaypointsFromFile("./routes/kitchen-route.csv")
+	waypoints, err := waypoint.ReadWaypointsFromFile("./routes/main-office.csv")
 	if err != nil {
 		logger.Panic(err)
 	}
