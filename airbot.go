@@ -33,7 +33,7 @@ func (a *AirBot) Start() {
 		a.logger.Errorw("error creating move manager", "err", err)
 		return
 	}
-	detector, err := imagedetector.NewDetector(a.robotClient, "top-cam", "coffee-mug-detector", a.logger)
+	detector, err := imagedetector.NewDetector(a.robotClient, "top-cam", "coffee-mug-vision-service", a.logger)
 	if err != nil {
 		a.logger.Errorw("error creating detector", "err", err)
 		return
