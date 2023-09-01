@@ -13,6 +13,7 @@ require (
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551
 	github.com/golangci/golangci-lint v1.51.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
+	github.com/joho/godotenv v1.5.1
 	github.com/rhysd/actionlint v1.6.24
 	go.viam.com/rdk v0.6.0
 	go.viam.com/test v1.1.1-0.20220913152726-5da9916c08a2

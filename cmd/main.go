@@ -12,6 +12,7 @@ import (
 	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot"
 	pb "github.com/ethanlook/airbot/proto/v1"
+	"github.com/joho/godotenv"
 	"go.viam.com/utils/rpc"
 	"google.golang.org/grpc"
 
@@ -50,6 +51,11 @@ func main() {
 	logger := golog.NewDevelopmentLogger("client")
 	ctx := context.Background()
 
+	err := godotenv.Load()
+	if err != nil {
+		logger.Panic(err)
+	}
+
 	robotClient, err := client.New(
 		context.Background(),
 		os.Getenv("ROBOT_LOCATION"),
@@ -60,7 +66,7 @@ func main() {
 		})),
 	)
 	if err != nil {
-		logger.Fatalf("failed to rcreate robot client")
+		logger.Fatalf("failed to create robot client")
 	}
 	defer func() {
 		err = robotClient.Close(ctx)

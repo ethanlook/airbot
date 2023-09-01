@@ -33,17 +33,27 @@ test:
 
 .PHONY: build
 build: 
-	mkdir -p bin && go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./cmd/main.go
+	mkdir -p bin && go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
+
+
+.PHONY: buildarm
+buildarm: 
+	mkdir -p bin && GOARCH="arm64" GOOS="linux" go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
 
 .PHONY: run
 run:
-	go run $(GO_BUILD_LDFLAGS) ./cmd/main.go
+	go run $(GO_BUILD_LDFLAGS) ./module/main.go
 
 .PHONY: buildstatic
 buildstatic: 
-	mkdir -p bin && CGO_ENABLED=0 CGO_LDFLAGS=${CGO_LDFLAGS} go build $(GO_BUILD_LDFLAGS) -o bin/module ./main.go
+	mkdir -p bin && CGO_ENABLED=0 CGO_LDFLAGS=${CGO_LDFLAGS} go build $(GO_BUILD_LDFLAGS) -o bin/module ./module/main.go
+
+package: build
 
 .PHONY: clean
 clean: 
 	rm -rf bin
 
+.PHONY: package
+package: build
+	tar -czf airbot.tar.gz bin/airbot routes
