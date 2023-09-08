@@ -31,8 +31,12 @@ test:
 	go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
 
+.PHONY: build-proto
+build-proto:
+	buf build
+
 .PHONY: build
-build: 
+build:
 	mkdir -p bin && go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
 
 
