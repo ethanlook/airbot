@@ -13,5 +13,12 @@ type Config struct {
 // It should return a []string which contains all of the implicit
 // dependencies of a module. (or nil,err if the config does not pass validation)
 func (cfg *Config) Validate(path string) ([]string, error) {
-	return []string{cfg.SlamService, cfg.MotionService, cfg.VisionService, cfg.BaseComponent, cfg.CameraComponent}, nil
+	return []string{
+		cfg.SlamService,
+		cfg.MotionService,
+		cfg.VisionService,
+
+		cfg.BaseComponent,
+		cfg.CameraComponent,
+	}, nil
 }

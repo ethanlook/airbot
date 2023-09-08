@@ -56,4 +56,4 @@ clean:
 
 .PHONY: package
 package: build
-	tar -czf airbot.tar.gz bin/airbot routes
+	tar -czf bin/airbot.tar.gz bin/airbot routes

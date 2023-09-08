@@ -8,13 +8,14 @@ import (
 	"path/filepath"
 
 	"github.com/edaniels/golog"
+	"github.com/ethanlook/airbot/imagedetector"
+	"github.com/ethanlook/airbot/move"
 	pb "github.com/ethanlook/airbot/proto/v1"
 	"github.com/ethanlook/airbot/waypoint"
 	"github.com/pkg/errors"
 
 	"go.viam.com/rdk/components/generic"
 	"go.viam.com/rdk/resource"
-	"go.viam.com/rdk/robot/client"
 )
 
 var errRouteUnspecified = errors.New("route unspecified")
@@ -38,11 +39,11 @@ func newAirBot(ctx context.Context, deps resource.Dependencies, conf resource.Co
 	cancelCtx, cancelFunc := context.WithCancel(context.Background())
 	instance := &AirBot{
 		Named:      conf.ResourceName().AsNamed(),
-		Config:     newConf,
+		config:     newConf,
+		deps:       deps,
 		cancelCtx:  cancelCtx,
 		cancelFunc: cancelFunc,
 		logger:     logger,
-		deps:       deps,
 	}
 	instance.logger.Infoln("Started")
 	return instance, nil
@@ -52,14 +53,13 @@ func newAirBot(ctx context.Context, deps resource.Dependencies, conf resource.Co
 type AirBot struct {
 	resource.Named
 	resource.AlwaysRebuild
-	Config *Config
+	config *Config
+	deps   resource.Dependencies
 
 	cancelCtx  context.Context
 	cancelFunc func()
 
-	logger      golog.Logger
-	robotClient *client.RobotClient
-	deps        resource.Dependencies
+	logger golog.Logger
 }
 
 // DoCommand sends/receives arbitrary data
@@ -105,13 +105,13 @@ func (a *AirBot) Start(route pb.Route) error {
 		return fmt.Errorf("error reading waypoints from file: %w", err)
 	}
 
-	moveManager, err := NewMoveManager(a.deps, a, a.logger)
+	moveManager, err := move.NewMoveManager(a.logger, a.deps, a.config.SlamService, a.config.BaseComponent)
 	if err != nil {
 		return fmt.Errorf("error creating move manager: %w", err)
 	}
-	detector, err := NewDetector(a.deps, a, "top-cam", "coffee-mug-detector", a.logger)
+	detector, err := imagedetector.NewDetector(a.logger, a.deps, a.config.VisionService, a.config.CameraComponent)
 	if err != nil {
-		return fmt.Errorf("error creating detector: %w", err)
+		return fmt.Errorf("error creating image detector: %w", err)
 	}
 
 	for i, w := range waypoints {
