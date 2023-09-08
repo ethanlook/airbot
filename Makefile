@@ -33,7 +33,7 @@ test:
 
 .PHONY: build-proto
 build-proto:
-	buf build
+	buf generate
 
 .PHONY: build
 build:
