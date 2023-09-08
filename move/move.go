@@ -8,7 +8,7 @@ import (
 	"github.com/ethanlook/airbot/waypoint"
 
 	"go.viam.com/rdk/components/base"
-	"go.viam.com/rdk/robot/client"
+	"go.viam.com/rdk/resource"
 	"go.viam.com/rdk/services/motion"
 	"go.viam.com/rdk/services/slam"
 	"go.viam.com/rdk/spatialmath"
@@ -22,8 +22,6 @@ type Move interface {
 
 // Manager holds all necessary info to move.
 type Manager struct {
-	// robot client
-	rc *client.RobotClient
 	// motion service
 	ms motion.Service
 	// slam service
@@ -34,21 +32,21 @@ type Manager struct {
 }
 
 // NewMoveManager creates a MoveManager.
-func NewMoveManager(robotClient *client.RobotClient, logger golog.Logger) (Move, error) {
-	ms, err := motion.FromRobot(robotClient, "builtin")
+func NewMoveManager(logger golog.Logger, deps resource.Dependencies, slamService string, baseComponent string) (Move, error) {
+	ms, err := motion.FromDependencies(deps, "builtin")
 	if err != nil {
 		return nil, err
 	}
-	slam, err := slam.FromRobot(robotClient, "run-slam")
+	slam, err := resource.FromDependencies[slam.Service](deps, resource.NewName(slam.API, slamService))
 	if err != nil {
 		return nil, err
 	}
-	base, err := base.FromRobot(robotClient, "viam_base")
+	base, err := base.FromDependencies(deps, baseComponent)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Manager{rc: robotClient, ms: ms, slam: slam, base: base, logger: logger}, nil
+	return &Manager{ms: ms, slam: slam, base: base, logger: logger}, nil
 }
 
 // MoveOnMap moves the rover to a waypoint on the slam map.

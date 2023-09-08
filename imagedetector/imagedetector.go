@@ -8,7 +8,7 @@ import (
 	"github.com/edaniels/golog"
 
 	"go.viam.com/rdk/components/camera"
-	"go.viam.com/rdk/robot/client"
+	"go.viam.com/rdk/resource"
 	"go.viam.com/rdk/services/vision"
 	"go.viam.com/rdk/vision/objectdetection"
 )
@@ -43,18 +43,18 @@ func (detector *Detector) HowManyMugs(detections []objectdetection.Detection) in
 
 // NewDetector returns a new detector.
 func NewDetector(
-	robotClient *client.RobotClient,
-	cameraName string,
-	visionServiceName string,
 	logger golog.Logger,
+	dependencies resource.Dependencies,
+	visionService string,
+	cameraComponent string,
 ) (*Detector, error) {
 	// Grab the camera from the robot
-	myCam, err := camera.FromRobot(robotClient, cameraName)
+	myCam, err := camera.FromDependencies(dependencies, cameraComponent)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get camera: %w", err)
 	}
 
-	visService, err := vision.FromRobot(robotClient, visionServiceName)
+	visService, err := vision.FromDependencies(dependencies, visionService)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get vision service: %w", err)
 	}

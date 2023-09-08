@@ -1,0 +1,13 @@
+{
+  "name": "ethanlook:airbot",
+  "visibility": "public",
+  "url": "http://github.com/ethanlook/airbot",
+  "description": "AirBot is an experimental service that nagivates a rover and collects air quality data.",
+  "models": [
+    {
+      "api": "ethanlook:service:airbot",
+      "model": "ethanlook:service:airbot"
+    }
+  ],
+  "entrypoint": "./bin/airbot"
+}
