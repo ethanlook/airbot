@@ -33,8 +33,7 @@ test:
 
 .PHONY: build
 build: 
-	mkdir -p bin && go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
-
+	mkdir -p bin && rm bin/airbot; go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
 
 .PHONY: buildarm
 buildarm: 
