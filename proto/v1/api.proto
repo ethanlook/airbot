@@ -17,6 +17,7 @@ service AirbotService {
 enum Route {
     ROUTE_UNSPECIFIED = 0;
     ROUTE_KITCHEN = 1;
+    ROUTE_FLEET_DESK = 2;
 }
 
 message StartRequest {
