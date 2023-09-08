@@ -14,14 +14,7 @@ import (
 	"go.viam.com/rdk/spatialmath"
 )
 
-// Move defines the interface to Move.
-type Move interface {
-	MoveOnMap(wp *waypoint.Waypoint, attempts int) error
-	Turn90() error
-}
-
-// Manager holds all necessary info to move.
-type Manager struct {
+type MoveManager struct {
 	// motion service
 	ms motion.Service
 	// slam service
@@ -32,7 +25,7 @@ type Manager struct {
 }
 
 // NewMoveManager creates a MoveManager.
-func NewMoveManager(logger golog.Logger, deps resource.Dependencies, slamService string, baseComponent string) (Move, error) {
+func NewMoveManager(logger golog.Logger, deps resource.Dependencies, slamService string, baseComponent string) (*MoveManager, error) {
 	ms, err := motion.FromDependencies(deps, "builtin")
 	if err != nil {
 		return nil, err
@@ -46,19 +39,14 @@ func NewMoveManager(logger golog.Logger, deps resource.Dependencies, slamService
 		return nil, err
 	}
 
-	return &Manager{ms: ms, slam: slam, base: base, logger: logger}, nil
+	return &MoveManager{ms: ms, slam: slam, base: base, logger: logger}, nil
 }
 
 // MoveOnMap moves the rover to a waypoint on the slam map.
-func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint, attempts int) error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
+func (mm *MoveManager) MoveOnMap(ctx context.Context, wp *waypoint.Waypoint, attempts int) error {
 	for i := 1; i <= attempts; i++ {
 		// moveOnMap uses the last orientation to pass to the new pose
 		// so followed that implementation there
-
-		// TODO(ethanlook): Child context?
 
 		lastPose, _, err := mm.slam.GetPosition(ctx)
 		if err != nil {
@@ -83,9 +71,6 @@ func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint, attempts int) error {
 }
 
 // Turn90 spins the base 90 degrees.
-func (mm *Manager) Turn90() error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
+func (mm *MoveManager) Turn90(ctx context.Context) error {
 	return mm.base.Spin(ctx, 90, 45, map[string]interface{}{})
 }

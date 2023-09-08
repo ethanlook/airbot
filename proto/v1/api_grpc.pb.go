@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AirbotServiceClient interface {
 	Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error)
+	Stop(ctx context.Context, in *StopRequest, opts ...grpc.CallOption) (*StopResponse, error)
 }
 
 type airbotServiceClient struct {
@@ -42,11 +43,21 @@ func (c *airbotServiceClient) Start(ctx context.Context, in *StartRequest, opts 
 	return out, nil
 }
 
+func (c *airbotServiceClient) Stop(ctx context.Context, in *StopRequest, opts ...grpc.CallOption) (*StopResponse, error) {
+	out := new(StopResponse)
+	err := c.cc.Invoke(ctx, "/proto.v1.AirbotService/Stop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AirbotServiceServer is the server API for AirbotService service.
 // All implementations must embed UnimplementedAirbotServiceServer
 // for forward compatibility
 type AirbotServiceServer interface {
 	Start(context.Context, *StartRequest) (*StartResponse, error)
+	Stop(context.Context, *StopRequest) (*StopResponse, error)
 	mustEmbedUnimplementedAirbotServiceServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedAirbotServiceServer struct {
 
 func (UnimplementedAirbotServiceServer) Start(context.Context, *StartRequest) (*StartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
+}
+func (UnimplementedAirbotServiceServer) Stop(context.Context, *StopRequest) (*StopResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
 func (UnimplementedAirbotServiceServer) mustEmbedUnimplementedAirbotServiceServer() {}
 
@@ -88,6 +102,24 @@ func _AirbotService_Start_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AirbotService_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AirbotServiceServer).Stop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.v1.AirbotService/Stop",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AirbotServiceServer).Stop(ctx, req.(*StopRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AirbotService_ServiceDesc is the grpc.ServiceDesc for AirbotService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var AirbotService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Start",
 			Handler:    _AirbotService_Start_Handler,
+		},
+		{
+			MethodName: "Stop",
+			Handler:    _AirbotService_Stop_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

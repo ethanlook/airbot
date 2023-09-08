@@ -21,12 +21,12 @@ type Detector struct {
 }
 
 // GetDetectionsFromCamera gets detections from camera.
-func (detector *Detector) GetDetectionsFromCamera() ([]objectdetection.Detection, error) {
-	return detector.vs.DetectionsFromCamera(context.Background(), detector.cam.Name().Name, map[string]interface{}{})
+func (d *Detector) GetDetectionsFromCamera(ctx context.Context) ([]objectdetection.Detection, error) {
+	return d.vs.DetectionsFromCamera(ctx, d.cam.Name().Name, map[string]interface{}{})
 }
 
 // HowManyMugs determines how many mugs in the frame.
-func (detector *Detector) HowManyMugs(detections []objectdetection.Detection) int {
+func (d *Detector) HowManyMugs(detections []objectdetection.Detection) int {
 	threshold := 0.7
 	count := 0
 
@@ -41,7 +41,7 @@ func (detector *Detector) HowManyMugs(detections []objectdetection.Detection) in
 	return count
 }
 
-// NewDetector returns a new detector.
+// NewDetector returns a new Detector.
 func NewDetector(
 	logger golog.Logger,
 	dependencies resource.Dependencies,
