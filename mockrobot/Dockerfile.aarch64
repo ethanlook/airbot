@@ -1,0 +1,6 @@
+FROM ghcr.io/viamrobotics/canon:arm64-cache
+RUN mkdir /bins
+RUN wget -O /bins/viam-server http://packages.viam.com/apps/viam-server/viam-server-stable-aarch64
+RUN wget -O /bins/viam-carto https://storage.googleapis.com/packages.viam.com/apps/slam-servers/cartographer-module-stable-aarch64.AppImage
+RUN chmod +x /bins/*
+CMD /bins/viam-server --config ./mockrobot/config.json

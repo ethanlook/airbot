@@ -58,9 +58,13 @@ clean:
 package: build
 	tar -czf bin/airbot.tar.gz bin/airbot routes
 
-.PHONY: mock-build
-mock-build: 
-	./mockrobot/buildImage.sh
+.PHONY: mock-build-arm
+mock-build-arm: 
+	docker build -t mockrobot . -f ./mockrobot/Dockerfile.aarch64
+
+.PHONY: mock-build-x86
+mock-build-x86: 
+	docker build -t mockrobot . -f ./mockrobot/Dockerfile.x86_64
 
 .PHONY: mock-run
 mock-run: 
