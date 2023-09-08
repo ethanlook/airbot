@@ -57,3 +57,11 @@ clean:
 .PHONY: package
 package: build
 	tar -czf bin/airbot.tar.gz bin/airbot routes
+
+.PHONY: mock-build
+mock-build: 
+	./mockrobot/buildImage.sh
+
+.PHONY: mock-run
+mock-run: 
+	./mockrobot/runImage.sh
