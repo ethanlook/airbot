@@ -64,15 +64,51 @@ type AirBot struct {
 
 // DoCommand sends/receives arbitrary data
 func (a *AirBot) DoCommand(ctx context.Context, cmd map[string]interface{}) (map[string]interface{}, error) {
-	route, ok := cmd["start"]
-	if ok {
-		switch route.(string) {
-		case "kitchen":
-			return nil, a.Start(pb.Route_ROUTE_KITCHEN)
+	if startCmd, ok := cmd["start"]; ok {
+		req := parseStartCommand(startCmd)
+		if req != nil {
+			return nil, a.Start(req)
 		}
 	}
 
 	return nil, fmt.Errorf("unknown DoCommand")
+}
+
+func parseStartCommand(cmd interface{}) *pb.StartRequest {
+	start, startOk := cmd.(map[string]interface{})
+	if !startOk {
+		return nil
+	}
+
+	route, routeOk := start["route"]
+	if !routeOk {
+		return nil
+	}
+
+	routeStr, routeStrOk := route.(string)
+	if !routeStrOk {
+		return nil
+	}
+
+	startWaypointNum, startWaypointNumOk := start["start_waypoint_num"]
+	if !startWaypointNumOk {
+		return nil
+	}
+
+	startWaypointNumInt, startWaypointNumIntOk := startWaypointNum.(uint32)
+	if !startWaypointNumIntOk {
+		return nil
+	}
+
+	switch routeStr {
+	case "kitchen":
+		return &pb.StartRequest{
+			Route:            pb.Route_ROUTE_KITCHEN,
+			StartWaypointNum: startWaypointNumInt,
+		}
+	}
+
+	return nil
 }
 
 // Close must safely shut down the resource and prevent further use.
@@ -85,14 +121,14 @@ func (a *AirBot) Close(ctx context.Context) error {
 }
 
 // Start starts the main navigation loop and data collection.
-func (a *AirBot) Start(route pb.Route) error {
+func (a *AirBot) Start(req *pb.StartRequest) error {
 	ex, err := os.Executable()
 	if err != nil {
 		return err
 	}
 
 	var waypointsFile string
-	switch route {
+	switch req.Route {
 	case pb.Route_ROUTE_KITCHEN:
 		waypointsFile = "../../routes/kitchen-route.csv"
 	case pb.Route_ROUTE_UNSPECIFIED:
@@ -100,9 +136,14 @@ func (a *AirBot) Start(route pb.Route) error {
 	default:
 		return errRouteUnspecified
 	}
+
 	waypoints, err := waypoint.ReadWaypointsFromFile(filepath.Join(ex, waypointsFile))
 	if err != nil {
 		return fmt.Errorf("error reading waypoints from file: %w", err)
+	}
+
+	if int(req.StartWaypointNum) > len(waypoints) {
+		return fmt.Errorf("start_waypoint_num out of bounds, %d >= len(waypoints), len(waypoints) = %d", req.StartWaypointNum, len(waypoints))
 	}
 
 	moveManager, err := move.NewMoveManager(a.logger, a.deps, a.config.SlamService, a.config.BaseComponent)
@@ -114,7 +155,8 @@ func (a *AirBot) Start(route pb.Route) error {
 		return fmt.Errorf("error creating image detector: %w", err)
 	}
 
-	for i, w := range waypoints {
+	for i := int(req.StartWaypointNum); i < len(waypoints); i++ {
+		w := waypoints[i]
 		a.logger.Infof("Starting navigation to waypoint #%d: %w", i, w)
 		err := moveManager.MoveOnMap(w, 3)
 		if err != nil {

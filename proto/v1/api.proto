@@ -21,6 +21,8 @@ enum Route {
 
 message StartRequest {
     Route route = 1;
+    // The waypoint number to start at. Zero-based indexing.
+    uint32 start_waypoint_num = 2;
 }
 
 message StartResponse {}
