@@ -14,6 +14,9 @@ dependencies:
   '@viamrobotics/sdk':
     specifier: ^0.3.2
     version: 0.3.2
+  protoc-gen-ts:
+    specifier: ^0.8.6
+    version: 0.8.6(google-protobuf@3.21.2)(typescript@5.2.2)
 
 devDependencies:
   '@fontsource/fira-mono':
@@ -1870,6 +1873,17 @@ packages:
     hasBin: true
     dev: true
 
+  /protoc-gen-ts@0.8.6(google-protobuf@3.21.2)(typescript@5.2.2):
+    resolution: {integrity: sha512-66oeorGy4QBvYjQGd/gaeOYyFqKyRmRgTpofmnw8buMG0P7A0jQjoKSvKJz5h5tNUaVkIzvGBUTRVGakrhhwpA==}
+    hasBin: true
+    peerDependencies:
+      google-protobuf: ^3.13.0
+      typescript: 4.x.x
+    dependencies:
+      google-protobuf: 3.21.2
+      typescript: 5.2.2
+    dev: false
+
   /punycode@2.3.0:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}
     engines: {node: '>=6'}
@@ -2283,7 +2297,6 @@ packages:
     resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
     engines: {node: '>=14.17'}
     hasBin: true
-    dev: true
 
   /undici@5.23.0:
     resolution: {integrity: sha512-1D7w+fvRsqlQ9GscLBwcAJinqcZGHUKjbOmXdlE/v8BvEGXjeWAax+341q44EuTcHXXnfyKNbKRq4Lg7OzhMmg==}

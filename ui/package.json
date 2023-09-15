@@ -39,6 +39,7 @@
   "dependencies": {
     "@floating-ui/dom": "^1.5.1",
     "@viamrobotics/prime": "^0.5.7",
-    "@viamrobotics/sdk": "^0.3.2"
+    "@viamrobotics/sdk": "^0.3.2",
+    "protoc-gen-ts": "^0.8.6"
   }
 }
