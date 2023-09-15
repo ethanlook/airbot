@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { proto } from '../../../dist/js/proto/v1/api';
 	import * as VIAM from '@viamrobotics/sdk';
 	import { Button, SearchableSelect } from '@viamrobotics/prime-core';
-	import { proto } from '../../../proto/v1/api';
 
 	{/*TODO: 	
 		* Remove function into its own file
@@ -33,7 +33,7 @@
 		return 'OK';
 	}
 
-	function getAvailableRoutes(): Array<string> {
+	function getAvailableRoutes() {
 		return [
 			proto.v1.Route.ROUTE_UNSPECIFIED.toString(),
 			proto.v1.Route.ROUTE_KITCHEN.toString()

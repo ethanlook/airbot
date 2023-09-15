@@ -6,6 +6,7 @@ TAG_VERSION?=$(shell git tag --points-at | sort -Vr | head -n1)
 CGO_LDFLAGS=""
 GO_BUILD_LDFLAGS = -ldflags "-X 'main.Version=${TAG_VERSION}' -X 'main.GitRevision=${GIT_REVISION}'"
 TOOL_BIN = bin/gotools/$(shell uname -s)-$(shell uname -m)
+PROTO_FILES := $(shell find proto/ -type f -name '*.proto')
 
 .PHONY: default
 default: build-module
@@ -78,3 +79,25 @@ mock-build-x86:
 .PHONY: mock-run
 mock-run: 
 	./mockrobot/runImage.sh
+
+dist/tool-install: Makefile
+	npm ci --audit=false
+	go install google.golang.org/protobuf/cmd/protoc-gen-go \
+		github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking \
+		github.com/bufbuild/buf/cmd/protoc-gen-buf-lint \
+		github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc \
+		google.golang.org/grpc/cmd/protoc-gen-go-grpc \
+		github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+		github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+		github.com/srikrsna/protoc-gen-gotag \
+		github.com/edaniels/golinters/cmd/combined \
+		github.com/golangci/golangci-lint/cmd/golangci-lint \
+		github.com/bufbuild/buf/cmd/buf
+	mkdir -p dist
+	touch dist/tool-install
+
+dist/buf-web: dist/tool-install $(PROTO_FILES)
+	buf lint
+	buf format -w
+	buf generate --template buf.gen.web.yaml
+	touch dist/buf-web

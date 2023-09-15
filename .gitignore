@@ -2,3 +2,5 @@ main
 .env
 bin/
 coverage.txt
+node_modules/
+dist/

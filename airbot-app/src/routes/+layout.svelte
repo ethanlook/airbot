@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import '@viamrobotics/prime-core/prime.css';
 </script>
 
@@ -29,3 +29,5 @@
 		justify-content: center;
 	}
 </style>
+
+

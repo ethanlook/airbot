@@ -2,25 +2,25 @@ syntax = "proto3";
 
 package proto.v1;
 
-option go_package = "proto/v1";
-
 import "google/api/annotations.proto";
 
+option go_package = "proto/v1";
+
 service AirbotService {
-    rpc Start(StartRequest) returns (StartResponse) {
-        option (google.api.http) = {
-            post: "/airbot/api/v1/start"
-          };
-    }
+  rpc Start(StartRequest) returns (StartResponse) {
+    option (google.api.http) = {
+      post: "/airbot/api/v1/start"
+    };
+  }
 }
 
 enum Route {
-    ROUTE_UNSPECIFIED = 0;
-    ROUTE_KITCHEN = 1;
+  ROUTE_UNSPECIFIED = 0;
+  ROUTE_KITCHEN = 1;
 }
 
 message StartRequest {
-    Route route = 1;
+  Route route = 1;
 }
 
 message StartResponse {}
