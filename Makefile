@@ -30,15 +30,24 @@ lint: tool-install
 test:
 	go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
+bin/buf bin/protoc-gen-go bin/protoc-gen-grpc-gateway bin/protoc-gen-go-grpc:
+	GOBIN=$(shell pwd)/bin go install \
+		github.com/bufbuild/buf/cmd/buf \
+		google.golang.org/protobuf/cmd/protoc-gen-go \
+		github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+		google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+.PHONY: build-proto
+build-proto: proto/v1/api.proto bin/buf bin/protoc-gen-go bin/protoc-gen-grpc-gateway bin/protoc-gen-go-grpc
+	PATH="$(shell pwd)/bin" buf generate
 
 .PHONY: build
 build: 
-	mkdir -p bin && go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
-
+	mkdir -p bin && rm bin/airbot; go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
 
 .PHONY: buildarm
 buildarm: 
-	mkdir -p bin && GOARCH="arm64" GOOS="linux" go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
+	mkdir -p bin && rm bin/airbot; GOARCH="arm64" GOOS="linux" go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
 
 .PHONY: run
 run:
@@ -57,3 +66,15 @@ clean:
 .PHONY: package
 package: build
 	tar -czf bin/airbot.tar.gz bin/airbot routes
+
+.PHONY: mock-build-arm
+mock-build-arm: 
+	docker build -t mockrobot . -f ./mockrobot/Dockerfile.aarch64
+
+.PHONY: mock-build-x86
+mock-build-x86: 
+	docker build -t mockrobot . -f ./mockrobot/Dockerfile.x86_64
+
+.PHONY: mock-run
+mock-run: 
+	./mockrobot/runImage.sh
