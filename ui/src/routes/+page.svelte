@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as VIAM from '@viamrobotics/sdk';
 	import { Button, SearchableSelect } from '@viamrobotics/prime-core';
+	import { proto } from '../../../proto/v1/api';
 
 	{/*TODO: 	
 		* Remove function into its own file
@@ -31,6 +32,13 @@
 
 		return 'OK';
 	}
+
+	function getAvailableRoutes(): Array<string> {
+		return [
+			proto.v1.Route.ROUTE_UNSPECIFIED.toString(),
+			proto.v1.Route.ROUTE_KITCHEN.toString()
+		];
+	}
 </script>
 
 <svelte:head>
@@ -45,7 +53,7 @@
 		<div class="flex gap-8 m-auto">
 			<!-- TODO: dynamically fetch routes -->
 			<div class="text-bold">Routes:</div>
-			<SearchableSelect options={['Route 1', 'Route 2']} />
+			<SearchableSelect options={getAvailableRoutes()} />
 		</div>
 
 		<div class="flex gap-12 justify-center">
