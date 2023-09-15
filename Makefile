@@ -37,7 +37,7 @@ build:
 
 .PHONY: buildarm
 buildarm: 
-	mkdir -p bin && GOARCH="arm64" GOOS="linux" go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
+	mkdir -p bin && rm bin/airbot; GOARCH="arm64" GOOS="linux" go build $(GO_BUILD_LDFLAGS) -o bin/airbot ./module/main.go
 
 .PHONY: run
 run:
