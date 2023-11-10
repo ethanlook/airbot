@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot/imagedetector"
 	"github.com/ethanlook/airbot/move"
 	pb "github.com/ethanlook/airbot/proto/v1"
 	"github.com/ethanlook/airbot/waypoint"
 	"github.com/pkg/errors"
+	"go.viam.com/rdk/logging"
 
 	"go.viam.com/rdk/components/generic"
 	"go.viam.com/rdk/resource"
@@ -24,14 +24,14 @@ var Model = resource.NewModel("ethanlook", "service", "airbot")
 
 func init() {
 	registration := resource.Registration[resource.Resource, *Config]{
-		Constructor: func(ctx context.Context, deps resource.Dependencies, conf resource.Config, logger golog.Logger) (resource.Resource, error) {
+		Constructor: func(ctx context.Context, deps resource.Dependencies, conf resource.Config, logger logging.Logger) (resource.Resource, error) {
 			return newAirBot(ctx, deps, conf, logger)
 		},
 	}
 	resource.RegisterComponent(generic.API, Model, registration)
 }
 
-func newAirBot(ctx context.Context, deps resource.Dependencies, conf resource.Config, logger golog.Logger) (resource.Resource, error) {
+func newAirBot(ctx context.Context, deps resource.Dependencies, conf resource.Config, logger logging.Logger) (resource.Resource, error) {
 	newConf, err := resource.NativeConfig[*Config](conf)
 	if err != nil {
 		return nil, errors.Wrap(err, "create component failed due to config parsing")
@@ -45,7 +45,7 @@ func newAirBot(ctx context.Context, deps resource.Dependencies, conf resource.Co
 		cancelFunc: cancelFunc,
 		logger:     logger,
 	}
-	instance.logger.Infoln("Started")
+	instance.logger.Info("Started\n")
 	return instance, nil
 }
 
@@ -59,7 +59,7 @@ type AirBot struct {
 	cancelCtx  context.Context
 	cancelFunc func()
 
-	logger golog.Logger
+	logger logging.Logger
 }
 
 // DoCommand sends/receives arbitrary data
@@ -109,10 +109,11 @@ func (a *AirBot) Start(route pb.Route) error {
 	if err != nil {
 		return fmt.Errorf("error creating move manager: %w", err)
 	}
-	detector, err := imagedetector.NewDetector(a.logger, a.deps, a.config.VisionService, a.config.CameraComponent)
-	if err != nil {
-		return fmt.Errorf("error creating image detector: %w", err)
-	}
+	// Disabling mug detector will we decide to add it back
+	// detector, err := imagedetector.NewDetector(a.logger, a.deps, a.config.VisionService, a.config.CameraComponent)
+	// if err != nil {
+	// 	return fmt.Errorf("error creating image detector: %w", err)
+	// }
 
 	for i, w := range waypoints {
 		a.logger.Infof("Starting navigation to waypoint #%d: %w", i, w)
@@ -123,25 +124,27 @@ func (a *AirBot) Start(route pb.Route) error {
 
 		a.logger.Infof("Successfully made it to waypoint: %w", w)
 
-		a.logger.Info("Starting coffee mug detection")
+		a.logger.Info("Starting data collection")
 
-		for j := 1; j <= 4; j++ {
-			a.logger.Infof("Turning 90 degrees #%d", j)
-			err = moveManager.Turn90()
-			if err != nil {
-				a.logger.Errorw("error turning 90 degrees", "err", err)
-			}
 
-			a.logger.Info("Doing image detection")
-			detections, err := detector.GetDetectionsFromCamera()
-			if err != nil {
-				continue
-			}
+		// Disabling mug detector will we decide to add it back
+		// for j := 1; j <= 4; j++ {
+		// 	a.logger.Infof("Turning 90 degrees #%d", j)
+		// 	err = moveManager.Turn90()
+		// 	if err != nil {
+		// 		a.logger.Errorw("error turning 90 degrees", "err", err)
+		// 	}
 
-			a.logger.Infof("Found %d mugs at waypoint #%d, turn #%d", detector.HowManyMugs(detections), i, j)
-		}
+		// 	a.logger.Info("Doing image detection")
+		// 	detections, err := detector.GetDetectionsFromCamera()
+		// 	if err != nil {
+		// 		continue
+		// 	}
 
-		a.logger.Info("Finished coffee mug detection")
+		// 	a.logger.Infof("Found %d mugs at waypoint #%d, turn #%d", detector.HowManyMugs(detections), i, j)
+		// }
+
+		// a.logger.Info("Finished coffee mug detection")
 	}
 
 	return nil

@@ -4,10 +4,10 @@ package move
 import (
 	"context"
 
-	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot/waypoint"
 
 	"go.viam.com/rdk/components/base"
+	"go.viam.com/rdk/logging"
 	"go.viam.com/rdk/resource"
 	"go.viam.com/rdk/services/motion"
 	"go.viam.com/rdk/services/slam"
@@ -28,11 +28,11 @@ type Manager struct {
 	slam slam.Service
 	// allows us to cancel the request
 	base   base.Base
-	logger golog.Logger
+	logger logging.Logger
 }
 
 // NewMoveManager creates a MoveManager.
-func NewMoveManager(logger golog.Logger, deps resource.Dependencies, slamService string, baseComponent string) (Move, error) {
+func NewMoveManager(logger logging.Logger, deps resource.Dependencies, slamService string, baseComponent string) (Move, error) {
 	ms, err := motion.FromDependencies(deps, "builtin")
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (mm *Manager) MoveOnMap(wp *waypoint.Waypoint, attempts int) error {
 
 		// TODO(ethanlook): Child context?
 
-		lastPose, _, err := mm.slam.GetPosition(ctx)
+		lastPose, _, err := mm.slam.Position(ctx)
 		if err != nil {
 			return err
 		}

@@ -3,4 +3,4 @@ RUN mkdir /bins
 RUN wget -O /bins/viam-server http://packages.viam.com/apps/viam-server/viam-server-stable-x86_64
 RUN wget -O /bins/viam-carto https://storage.googleapis.com/packages.viam.com/apps/slam-servers/cartographer-module-stable-x86_64.AppImage
 RUN chmod +x /bins/*
-CMD /bins/viam-server --config ./mockrobot/config.json
+CMD go build -o /airbot/bin/airbot /airbot/module/main.go && /bins/viam-server --config ./mockrobot/config.json

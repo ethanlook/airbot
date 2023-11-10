@@ -5,9 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/edaniels/golog"
-
 	"go.viam.com/rdk/components/camera"
+	"go.viam.com/rdk/logging"
 	"go.viam.com/rdk/resource"
 	"go.viam.com/rdk/services/vision"
 	"go.viam.com/rdk/vision/objectdetection"
@@ -17,7 +16,7 @@ import (
 type Detector struct {
 	cam    camera.Camera
 	vs     vision.Service
-	logger golog.Logger
+	logger logging.Logger
 }
 
 // GetDetectionsFromCamera gets detections from camera.
@@ -43,7 +42,7 @@ func (detector *Detector) HowManyMugs(detections []objectdetection.Detection) in
 
 // NewDetector returns a new detector.
 func NewDetector(
-	logger golog.Logger,
+	logger logging.Logger,
 	dependencies resource.Dependencies,
 	visionService string,
 	cameraComponent string,

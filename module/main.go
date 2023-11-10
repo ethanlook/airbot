@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/edaniels/golog"
 	"github.com/ethanlook/airbot"
 	"go.viam.com/rdk/components/generic"
+	"go.viam.com/rdk/logging"
 	"go.viam.com/rdk/module"
 
 	"go.viam.com/utils"
@@ -19,7 +19,7 @@ var (
 func main() {
 	utils.ContextualMain(mainWithArgs, module.NewLoggerFromArgs("AirBotModule"))
 }
-func mainWithArgs(ctx context.Context, args []string, logger golog.Logger) error {
+func mainWithArgs(ctx context.Context, args []string, logger logging.Logger) error {
 	var versionFields []interface{}
 	if Version != "" {
 		versionFields = append(versionFields, "version", Version)
