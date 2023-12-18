@@ -67,6 +67,8 @@ func (a *AirBot) DoCommand(ctx context.Context, cmd map[string]interface{}) (map
 	route, ok := cmd["start"]
 	if ok {
 		switch route.(string) {
+		case "fleet":
+			return nil, a.Start(pb.Route_ROUTE_FLEET_DESK)
 		case "kitchen":
 			return nil, a.Start(pb.Route_ROUTE_KITCHEN)
 		}
@@ -95,6 +97,8 @@ func (a *AirBot) Start(route pb.Route) error {
 	switch route {
 	case pb.Route_ROUTE_KITCHEN:
 		waypointsFile = "../../routes/kitchen-route.csv"
+	case pb.Route_ROUTE_FLEET_DESK:
+		waypointsFile = "../../routes/main-office.csv"
 	case pb.Route_ROUTE_UNSPECIFIED:
 		fallthrough
 	default:
