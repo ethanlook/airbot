@@ -24,4 +24,5 @@ message StartRequest {
     Route route = 1;
 }
 
+// Test comment
 message StartResponse {}
